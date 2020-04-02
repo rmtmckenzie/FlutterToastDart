@@ -8,15 +8,21 @@ class Toast {
   static final int center = 1;
   static final int top = 2;
 
-  static void show(String msg, BuildContext context,
-      {int duration = 1,
+  /// Must provide one of overlayState and context.
+  /// Both are required so as to make it more explicit.
+  static void show(String msg, { 
+      @required BuildContext context,
+      @required OverlayState overlayState,
+      int duration = 1,
       int gravity = 0,
       Color backgroundColor = const Color(0xAA000000),
       textStyle = const TextStyle(fontSize: 15, color: Colors.white),
       double backgroundRadius = 20,
       Border border}) {
+    assert(overlayState ?? context ?? false);
+    
     ToastView.dismiss();
-    ToastView.createView(msg, context, duration, gravity, backgroundColor,
+    ToastView.createView(msg, overlayState ?? Overlay.of(context), duration, gravity, backgroundColor,
         textStyle, backgroundRadius, border);
   }
 }
@@ -30,20 +36,18 @@ class ToastView {
 
   ToastView._internal();
 
-  static OverlayState overlayState;
   static OverlayEntry _overlayEntry;
   static bool _isVisible = false;
 
   static void createView(
       String msg,
-      BuildContext context,
+      OverlayState overlayState,
       int duration,
       int gravity,
       Color background,
       TextStyle textStyle,
       double backgroundRadius,
       Border border) async {
-    overlayState = Overlay.of(context);
 
     Paint paint = Paint();
     paint.strokeCap = StrokeCap.square;
