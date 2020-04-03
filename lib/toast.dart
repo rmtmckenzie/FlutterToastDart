@@ -19,7 +19,7 @@ class Toast {
       textStyle = const TextStyle(fontSize: 15, color: Colors.white),
       double backgroundRadius = 20,
       Border border}) {
-    assert(overlayState ?? context ?? false);
+    assert(!(overlayState == null && context == null));
     
     ToastView.dismiss();
     ToastView.createView(msg, overlayState ?? Overlay.of(context), duration, gravity, backgroundColor,
