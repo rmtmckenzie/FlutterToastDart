@@ -10,8 +10,8 @@ class Toast {
 
   /// Must provide one of overlayState and context.
   /// Both are required so as to make it more explicit.
-  static void show(String msg, { 
-      @required BuildContext context,
+  static void show(String msg,
+      {@required BuildContext context,
       @required OverlayState overlayState,
       int duration = 1,
       int gravity = 0,
@@ -20,10 +20,10 @@ class Toast {
       double backgroundRadius = 20,
       Border border}) {
     assert(!(overlayState == null && context == null));
-    
+
     ToastView.dismiss();
-    ToastView.createView(msg, overlayState ?? Overlay.of(context), duration, gravity, backgroundColor,
-        textStyle, backgroundRadius, border);
+    ToastView.createView(msg, overlayState ?? Overlay.of(context), duration,
+        gravity, backgroundColor, textStyle, backgroundRadius, border);
   }
 }
 
@@ -40,43 +40,51 @@ class ToastView {
   static bool _isVisible = false;
 
   static void createView(
-      String msg,
-      OverlayState overlayState,
-      int duration,
-      int gravity,
-      Color background,
-      TextStyle textStyle,
-      double backgroundRadius,
-      Border border) async {
-
+    String msg,
+    OverlayState overlayState,
+    int duration,
+    int gravity,
+    Color background,
+    TextStyle textStyle,
+    double backgroundRadius,
+    Border border,
+  ) async {
     Paint paint = Paint();
     paint.strokeCap = StrokeCap.square;
     paint.color = background;
 
     _overlayEntry = new OverlayEntry(
       builder: (BuildContext context) => ToastWidget(
-          widget: Container(
+        widget: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Container(
+            alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: background,
-                    borderRadius: BorderRadius.circular(backgroundRadius),
-                    border: border,
-                  ),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
-                  child: Text(msg, softWrap: true, style: textStyle),
-                )),
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.circular(backgroundRadius),
+                border: border,
+              ),
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Text(
+                msg,
+                softWrap: true,
+                style: textStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
           ),
-          gravity: gravity),
+        ),
+        gravity: gravity,
+      ),
     );
     _isVisible = true;
     overlayState.insert(_overlayEntry);
     await new Future.delayed(
-        Duration(seconds: duration == null ? Toast.lengthShort : duration));
+      Duration(seconds: duration == null ? Toast.lengthShort : duration),
+    );
     dismiss();
   }
 
@@ -103,7 +111,8 @@ class ToastWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Positioned(
         top: gravity == 2 ? MediaQuery.of(context).viewInsets.top + 50 : null,
-        bottom: gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
+        bottom:
+            gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
         child: Material(
           color: Colors.transparent,
           child: widget,
