@@ -10,20 +10,21 @@ class Toast {
 
   /// Must provide one of overlayState and context.
   /// Both are required so as to make it more explicit.
-  static void show(String msg,
-      {@required BuildContext context,
-      @required OverlayState overlayState,
-      int duration = 1,
-      int gravity = 0,
-      Color backgroundColor = const Color(0xAA000000),
-      textStyle = const TextStyle(fontSize: 15, color: Colors.white),
-      double backgroundRadius = 20,
-      Border border}) {
-    assert(!(overlayState == null && context == null));
-
+  static void show(
+    String msg, {
+    required BuildContext context,
+    OverlayState? overlayState,
+    int? duration = 1,
+    int? gravity = 0,
+    Color backgroundColor = const Color(0xAA000000),
+    textStyle = const TextStyle(fontSize: 15, color: Colors.white),
+    double backgroundRadius = 20,
+    bool rootOverlay = false,
+    Border? border,
+  }) {
     ToastView.dismiss();
-    ToastView.createView(msg, overlayState ?? Overlay.of(context), duration,
-        gravity, backgroundColor, textStyle, backgroundRadius, border);
+    ToastView.createView(msg, overlayState ?? Overlay.of(context, rootOverlay: rootOverlay)!, duration, gravity,
+        backgroundColor, textStyle, backgroundRadius, border);
   }
 }
 
@@ -36,23 +37,19 @@ class ToastView {
 
   ToastView._internal();
 
-  static OverlayEntry _overlayEntry;
+  static OverlayEntry? _overlayEntry;
   static bool _isVisible = false;
 
   static void createView(
     String msg,
     OverlayState overlayState,
-    int duration,
-    int gravity,
+    int? duration,
+    int? gravity,
     Color background,
     TextStyle textStyle,
     double backgroundRadius,
-    Border border,
+    Border? border,
   ) async {
-    Paint paint = Paint();
-    paint.strokeCap = StrokeCap.square;
-    paint.color = background;
-
     _overlayEntry = new OverlayEntry(
       builder: (BuildContext context) => ToastWidget(
         widget: Container(
@@ -81,7 +78,7 @@ class ToastView {
       ),
     );
     _isVisible = true;
-    overlayState.insert(_overlayEntry);
+    overlayState.insert(_overlayEntry!);
     await new Future.delayed(
       Duration(seconds: duration == null ? Toast.lengthShort : duration),
     );
@@ -99,23 +96,23 @@ class ToastView {
 
 class ToastWidget extends StatelessWidget {
   ToastWidget({
-    Key key,
-    @required this.widget,
-    @required this.gravity,
+    Key? key,
+    required this.widget,
+    required this.gravity,
   }) : super(key: key);
 
   final Widget widget;
-  final int gravity;
+  final int? gravity;
 
   @override
   Widget build(BuildContext context) {
     return new Positioned(
-        top: gravity == 2 ? MediaQuery.of(context).viewInsets.top + 50 : null,
-        bottom:
-            gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
-        child: Material(
-          color: Colors.transparent,
-          child: widget,
-        ));
+      top: gravity == 2 ? MediaQuery.of(context).viewInsets.top + 50 : null,
+      bottom: gravity == 0 ? MediaQuery.of(context).viewInsets.bottom + 50 : null,
+      child: Material(
+        color: Colors.transparent,
+        child: widget,
+      ),
+    );
   }
 }
